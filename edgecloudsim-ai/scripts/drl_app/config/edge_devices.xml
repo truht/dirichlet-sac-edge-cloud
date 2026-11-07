@@ -1,0 +1,1453 @@
+<?xml version="1.0"?>
+<!--
+  Tutorial3-AI: edge_devices_tx2.xml — Jetson TX2 GPU Edge Nodes
+
+  GPU Simulation Mapping:
+    VM.MIPS = effectiveTFLOPS × 10^6 = ratedTFLOPS × η × 10^6
+    Jetson TX2: 0.75 TFLOPS × η=0.18 × 10^6 = 135,000 MFLOPS
+
+  Verification (calibrated từ Bouzidi 2022 measured TX2 times):
+    ResNet-50 FP32 batch=1:
+      cloudletLength = 7710M × 0.88(arch) × 1.0(quant) × 1.50(overhead) = 10,178 MFLOP
+      processingTime = 10178 / 135000 = 0.0754s ≈ 75ms ✓ (Bouzidi 2022 TX2 measured)
+
+    MobileNetV2 FP32 batch=1:
+      cloudletLength = 300M × 0.92(arch) × 7.35(overhead) = 2,029 MFLOP
+      processingTime = 2029 / 135000 = 0.0150s ≈ 15ms ✓ (framework overhead dominates)
+
+    YOLOv5s FP32 batch=1:
+      cloudletLength = 8640M × 0.88(arch) × 1.42(overhead) = 10,796 MFLOP
+      processingTime = 10796 / 135000 = 0.0800s ≈ 80ms ✓
+
+  14 edge datacenters, 8 VMs per host (same topology as tutorial3)
+-->
+<edge_devices>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>1</x_pos>
+			<y_pos>1</y_pos>
+			<wlan_id>0</wlan_id>
+			<attractiveness>0</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>2</x_pos>
+			<y_pos>2</y_pos>
+			<wlan_id>1</wlan_id>
+			<attractiveness>0</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>3</x_pos>
+			<y_pos>3</y_pos>
+			<wlan_id>2</wlan_id>
+			<attractiveness>1</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>4</x_pos>
+			<y_pos>4</y_pos>
+			<wlan_id>3</wlan_id>
+			<attractiveness>1</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>5</x_pos>
+			<y_pos>5</y_pos>
+			<wlan_id>4</wlan_id>
+			<attractiveness>1</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>6</x_pos>
+			<y_pos>6</y_pos>
+			<wlan_id>5</wlan_id>
+			<attractiveness>1</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>7</x_pos>
+			<y_pos>7</y_pos>
+			<wlan_id>6</wlan_id>
+			<attractiveness>2</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>8</x_pos>
+			<y_pos>8</y_pos>
+			<wlan_id>7</wlan_id>
+			<attractiveness>2</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>9</x_pos>
+			<y_pos>9</y_pos>
+			<wlan_id>8</wlan_id>
+			<attractiveness>2</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>10</x_pos>
+			<y_pos>10</y_pos>
+			<wlan_id>9</wlan_id>
+			<attractiveness>2</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>11</x_pos>
+			<y_pos>11</y_pos>
+			<wlan_id>10</wlan_id>
+			<attractiveness>2</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>12</x_pos>
+			<y_pos>12</y_pos>
+			<wlan_id>11</wlan_id>
+			<attractiveness>2</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>13</x_pos>
+			<y_pos>13</y_pos>
+			<wlan_id>12</wlan_id>
+			<attractiveness>2</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+	<datacenter arch="x86" os="Linux" vmm="Xen">
+		<costPerBw>0.1</costPerBw>
+		<costPerSec>3.0</costPerSec>
+		<costPerMem>0.05</costPerMem>
+		<costPerStorage>0.1</costPerStorage>
+		<location>
+			<x_pos>14</x_pos>
+			<y_pos>14</y_pos>
+			<wlan_id>13</wlan_id>
+			<attractiveness>2</attractiveness>
+		</location>
+		<hosts>
+			<host>
+				<core>16</core>
+				<mips>1200000</mips>
+				<ram>16000</ram>
+				<storage>400000</storage>
+				<VMs>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+					<VM vmm="Xen">
+						<core>2</core>
+						<cpu_mips>3000</cpu_mips>        <!-- ARM Cortex-A57 on TX2 -->
+						<mips>135000</mips>
+						<ram>2000</ram>
+						<storage>50000</storage>
+						<gpu_mips>135000</gpu_mips>  <!-- TX2 GPU: 0.75 TFLOPS × 0.18 × 10^6 MFLOPS -->
+						<vram_mb>8192</vram_mb>       <!-- TX2: 8 GB unified LPDDR4 -->
+						<power_w>15</power_w>         <!-- TX2 power budget, DRL battery model -->
+					</VM>
+				</VMs>
+			</host>
+		</hosts>
+	</datacenter>
+</edge_devices>

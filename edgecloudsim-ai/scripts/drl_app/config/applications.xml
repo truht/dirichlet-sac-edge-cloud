@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!--
+  ============================================================================
+  tutorial3_ai_flop : applications.xml
+  ============================================================================
+  Kịch bản: TẢI AI (AI cloudlet load)
+    - Một yêu cầu suy diễn (inference request)  ->  mở ra 1 cloudlet
+    - Mỗi cloudlet phát sinh nhu cầu tài nguyên: GPU (FLOP), CPU (core), RAM
+    - SỐ FLOP được ĐỊNH NGHĨA TRỰC TIẾP trong file XML này (KHÔNG tính toán)
+
+  CHỈ MỘT loại ứng dụng (cho 1 loại ứng dụng) -> usage_percentage = 100.
+
+  ──────────────────────────────────────────────────────────────────────────
+  TÁCH BẠCH CPU và GPU (điểm mấu chốt của kịch bản này):
+  ──────────────────────────────────────────────────────────────────────────
+    <task_length>  = CPU MI    (kênh CPU: tiền xử lý)  -> cloudletLength
+    <gpu_flops>    = GPU MFLOP  (kênh GPU: inference)   -> Task.tensors  (ĐẶT THẲNG, không tính)
+
+    DualChannelScheduler tính:
+        cpuTime        = cloudletLength / cpu_mips   (cpu_mips trong edge_devices.xml)
+        gpuTime        = tensors        / gpu_mips   (gpu_mips = <mips> = VM.MIPS)
+        processingTime = max(cpuTime, gpuTime)
+
+    Muốn đổi tải GPU -> chỉ cần sửa <gpu_flops>; đổi tải CPU -> sửa <task_length>.
+    KHÔNG cần sửa code.
+  ──────────────────────────────────────────────────────────────────────────
+
+  Tài nguyên khác mà mỗi cloudlet yêu cầu:
+    required_core            -> số core CPU mỗi cloudlet chiếm
+    vm_utilization_on_edge   -> % CPU overhead (GPU driver) khi xử lý trên edge
+    vm_utilization_on_cloud  -> % CPU overhead khi xử lý trên cloud
+    data_upload / data_download -> RAM/băng thông cho ảnh vào & kết quả ra
+-->
+<applications>
+
+    <!--
+      AI_INFERENCE : một loại tải suy diễn AI duy nhất. TÁCH BẠCH CPU / GPU:
+        <task_length> = CPU MI   (phần tiền xử lý ảnh chạy trên CPU)
+        <gpu_flops>   = GPU MFLOP (phần inference chạy trên GPU) — ĐẶT THẲNG, không tính
+
+      Ví dụ ResNet-50 trên TX2 (cpu_mips=3000, gpu_mips=135000):
+        cpuTime = 24    / 3000   =  8 ms
+        gpuTime = 10178 / 135000 = 75 ms
+        processingTime = max(8, 75) = 75 ms   (GPU là nút thắt)
+      Trên cloud (cpu=100000, gpu=3500000): max(0.24ms, 2.9ms) = 2.9 ms.
+
+      Đổi <gpu_flops> để mô phỏng mô hình khác (vd 2029 ~ MobileNetV2, 10796 ~ YOLOv5s).
+    -->
+    <application name="AI_INFERENCE">
+        <usage_percentage>100</usage_percentage>     <!-- chỉ 1 ứng dụng -->
+        <prob_cloud_selection>0</prob_cloud_selection>
+        <poisson_interarrival>2</poisson_interarrival><!-- ~0.5 yêu cầu/giây (tải cao -> edge bão hòa -> dùng cloud) -->
+        <active_period>40</active_period>             <!-- chu kỳ hoạt động (giây) -->
+        <idle_period>20</idle_period>                 <!-- chu kỳ nghỉ (giây) -->
+        <data_upload>150</data_upload>                <!-- ảnh 224x224 JPEG ≈ 150 KB -->
+        <data_download>4</data_download>              <!-- kết quả top-5 ≈ 4 KB -->
+        <task_length>24</task_length>                 <!-- *** CPU MI (tiền xử lý) — kênh CPU *** -->
+        <gpu_flops>10178</gpu_flops>                  <!-- *** GPU MFLOP (inference) đặt thẳng — kênh GPU *** -->
+        <gpu_vram_mb>650</gpu_vram_mb>                <!-- *** VRAM/task (MB), field mới cho DRL Constraint C5 ***
+                                                             ResNet-50 batch=1 ~0.65GB (weights+activations), đặt
+                                                             thẳng như gpu_flops — KHÔNG tính toán -->
+        <required_core>1</required_core>              <!-- CPU: 1 core / cloudlet -->
+        <vm_utilization_on_edge>5</vm_utilization_on_edge>
+        <vm_utilization_on_cloud>3</vm_utilization_on_cloud>
+        <vm_utilization_on_mobile>0</vm_utilization_on_mobile>
+        <delay_sensitivity>1</delay_sensitivity>
+        <max_delay_requirement>0.1</max_delay_requirement>  <!-- SLA 100 ms -->
+    </application>
+
+</applications>

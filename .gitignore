@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Java build artifacts
+bin/
+*.class
+
+# Eclipse
+.settings/
+
+# Simulation outputs (not part of the released code)
+sim_results/
+logs/
+*.log
